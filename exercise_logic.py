@@ -70,21 +70,69 @@ def evaluate_finger_taps(results):
     return score, feedback
 
 
+
+
 def evaluate_grip_opening(results):
-    landmarks = results.multi_hand_landmarks[0]
-    palm_center = np.array([landmarks.landmark[0].x, landmarks.landmark[0].y])
-    finger_tips = [4, 8, 12, 16, 20]
+    if not results.multi_hand_landmarks:
+        return 0.0, "No hand detected"
+
+    hand_landmarks = results.multi_hand_landmarks[0]
+    landmarks = hand_landmarks.landmark
+
+    
+    finger_tips = [8, 12, 16, 20]
+
+    
+    palm_indices = [0, 5, 9, 13, 17] 
+    palm_coords = np.array([[landmarks[i].x, landmarks[i].y] for i in palm_indices])
+    palm_center = np.mean(palm_coords, axis=0)
 
     dists = []
     for tip in finger_tips:
-        tip_coord = np.array([landmarks.landmark[tip].x, landmarks.landmark[tip].y])
+        tip_coord = np.array([landmarks[tip].x, landmarks[tip].y])
         dists.append(np.linalg.norm(tip_coord - palm_center))
 
     avg_dist = np.mean(dists)
+
+    
     score = min(avg_dist * 5, 1.0)
-    feedback = "Hand open!" if score > 0.6 else "Try opening more"
+
+    feedback = "Good! Now relax your fingers." if score > 0.8 else "Spread your fingers wide!"
     return score, feedback
 
+
+
+
+def compute_spread_score(results):
+    if not results.multi_hand_landmarks:
+        return 0.0
+
+    hand_landmarks = results.multi_hand_landmarks[0]
+    landmarks = hand_landmarks.landmark
+
+    
+    finger_tips = [8, 12, 16, 20]
+
+    
+    palm_indices = [0, 1, 5, 9, 13, 17]  
+    palm_coords = np.array([[landmarks[i].x, landmarks[i].y] for i in palm_indices])
+    palm_center = np.mean(palm_coords, axis=0)
+
+    dists = []
+    for tip in finger_tips:
+        tip_coord = np.array([landmarks[tip].x, landmarks[tip].y])
+        dist = np.linalg.norm(tip_coord - palm_center)
+        dists.append(dist)
+
+    avg_dist = np.mean(dists)
+
+    
+    spread_score = np.clip((avg_dist - 0.05) / (0.20 - 0.05), 0, 1)
+
+    return spread_score
+
+
+    
 
 def angle_between(v1, v2):
     unit1 = v1 / np.linalg.norm(v1)
