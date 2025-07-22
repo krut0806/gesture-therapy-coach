@@ -1,6 +1,8 @@
 import streamlit as st
 import cv2
 import time
+import os
+import pandas as pd 
 from tracker import HandTracker
 from exercise_logic import (
     evaluate_finger_flexion,
@@ -12,10 +14,8 @@ from exercise_logic import (
 from logger import log_progress, init_log
 import datetime
 
-
 st.set_page_config(page_title="Therapy Coach", layout="wide")
 st.title("Gesture-Based Physical Therapy Coach")
-
 
 exercises = [
     {
@@ -46,6 +46,7 @@ exercises = [
 ]
 
 username = st.text_input("Enter your name", "patient_01")
+log_file = f"data/{username}.csv"  
 stframe = st.empty()
 instr_box = st.empty()
 session_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -61,7 +62,6 @@ if run_session:
         instruction = exercise["instruction"]
         evaluator = exercise["func"]
 
-        
         countdown_seconds = 3
         start_time = time.time()
 
@@ -77,11 +77,11 @@ if run_session:
             stframe.image(frame, channels="BGR")
             time.sleep(0.03)
 
-       
         instr_box.markdown(f"<h2 style='text-align: center;'>{instruction}</h2>", unsafe_allow_html=True)
 
         reps = 0
         target_reps = 5
+        gesture_active = False  
 
         while cap.isOpened() and reps < target_reps:
             ret, frame = cap.read()
@@ -94,7 +94,6 @@ if run_session:
             if results.multi_hand_landmarks:
                 score, feedback = evaluator(results)
 
-                
                 if name == "Wrist Rotation":
                     threshold = 0.3
                 elif name == "Finger Taps":
@@ -108,14 +107,16 @@ if run_session:
                             cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
 
                 if score > threshold:
-                    reps += 1
-                    log_progress(username, name, score, feedback)
-                    time.sleep(0.5)
+                    if not gesture_active:
+                        reps += 1
+                        log_progress(username, name, score, feedback)
+                    gesture_active = True
+                else:
+                    gesture_active = False
 
             stframe.image(annotated, channels="BGR")
             time.sleep(0.03)
 
-       
         done_time = time.time() + 3
         while time.time() < done_time:
             ret, frame = cap.read()
@@ -127,7 +128,6 @@ if run_session:
             cv2.putText(annotated, f"Completed!", (30, 50),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 200, 0), 2)
 
-            
             if idx == len(exercises) - 1:
                 cv2.putText(annotated, "Therapy session complete!", (30, 100),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 150, 255), 2)
@@ -136,6 +136,22 @@ if run_session:
             time.sleep(0.03)
 
     cap.release()
+
+    
+    if os.path.exists(log_file):
+        df = pd.read_csv(log_file)
+        today = session_date.split()[0]
+        df_today = df[df["Timestamp"].str.startswith(today)]
+
+        
+        avg_scores = df_today.groupby("Exercise")["Score"].mean().reset_index()
+        avg_scores["Score"] = avg_scores["Score"].round(2)
+
+        st.markdown(" Average Scores for Today")
+        st.dataframe(avg_scores)
+    else:
+        st.warning("No log data found for this session.")
+
     instr_box.markdown(
         f"<h2 style='text-align: center; color: green;'>Therapy session complete! All progress has been logged.</h2>",
         unsafe_allow_html=True
