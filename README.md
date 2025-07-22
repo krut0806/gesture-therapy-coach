@@ -41,9 +41,13 @@ streamlit run main.py
 
 ## File Structure
 **main.py** — Streamlit front-end with webcam logic and session loop
+
 **tracker.py** — Handles hand tracking via MediaPipe
+
 **exercise_logic.py** — Contains logic to evaluate each gesture
+
 **logger.py** — Logs progress for each repetition
+
 **requirements.txt** — Python dependencies
 
 
