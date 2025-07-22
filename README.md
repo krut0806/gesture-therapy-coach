@@ -27,7 +27,7 @@ This is a webcam-based physical therapy assistant that uses hand gesture recogni
 1. **Clone the repository**:
 
    
-   git clone https://github.com/yourusername/gesture-therapy-coach.git
+   git clone https://github.com/krut0806/gesture therapy coach.git
    cd gesture-therapy-coach
    
 2. **Create a virtual environment**:
