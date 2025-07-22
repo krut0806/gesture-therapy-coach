@@ -124,7 +124,7 @@ if run_session:
             frame = cv2.flip(frame, 1)
             results, annotated = tracker.process_frame(frame)
 
-            cv2.putText(annotated, f"Completed: {target_reps} reps", (30, 50),
+            cv2.putText(annotated, f"Completed!", (30, 50),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 200, 0), 2)
 
             
