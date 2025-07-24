@@ -15,6 +15,13 @@ This is a webcam-based physical therapy assistant that uses hand gesture recogni
 - Automatic repetition counting based on gesture accuracy
 - Final session summary including average scores per exercise
 - Simple Streamlit interface to run in a browser
+- 
+- #  Demo & Showcase
+
+Check out the live demo video of this project on LinkedIn:  
+🔗 https://www.linkedin.com/posts/kruthika-reddy-nimma_computervision-physiotherapy-streamlit-activity-7354069608242319363-WbzY?utm_source=share&utm_medium=member_desktop&rcm=ACoAAETmrdoBSAQ33VKPD5wtrCwcfKQwTNfuK5U
+
+In this video, you’ll see the **Gesture-Based Physical Therapy Coach** in action, guiding users through real-time hand rehabilitation exercises with live feedback and scoring.
 
 ## Requirements
 
