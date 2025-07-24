@@ -39,9 +39,11 @@ In this video, you’ll see the **Gesture-Based Physical Therapy Coach** in acti
    
 2. **Create a virtual environment**:
     python -m venv venv
-    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    source venv/bin/activate
+   
 3.**Install the dependencies**:
      pip install -r requirements.txt
+     
 4.**Run the App**
 streamlit run main.py
 
